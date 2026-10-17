@@ -36,7 +36,7 @@ RUN bun run build
 
 RUN bun run minify
 
-RUN mkdir -p /app/data && chown -R 1000:1000 /app /home/bun
+RUN mkdir -p /app/data && chown -R 1000:1000 /app/Overlord-Client* /app/data /home/bun 2>/dev/null || true
 
 USER root
 
