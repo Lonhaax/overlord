@@ -8,7 +8,7 @@
 
 Hello, I made this project for fun.
 
-The canonical repository is [GitHub](https://github.com/doesntbreaktos/Overlord); [GitLab](https://gitlab.com/vxaboveground/overlord) is maintained only as a source mirror.
+The canonical repository is [GitHub](https://github.com/Lonhaax/overlord); [GitLab](https://gitlab.com/vxaboveground/overlord) is maintained only as a source mirror.
 
 The server is TypeScript on Node/Bun. The client is Go. Operators talk to the server through a web panel or the Electron desktop app, and agents connect over encrypted WebSockets.
 
@@ -143,7 +143,7 @@ docker compose version
 **2. Get the project**
 
 ```powershell
-git clone https://github.com/doesntbreaktos/Overlord.git
+git clone https://github.com/Lonhaax/overlord.git
 cd Overlord
 ```
 
@@ -241,14 +241,14 @@ Make a folder for it, drop in the file, and you're done:
 
 ```bash
 mkdir overlord && cd overlord
-wget https://raw.githubusercontent.com/doesntbreaktos/Overlord/main/docker-compose.yml
+wget https://raw.githubusercontent.com/Lonhaax/overlord/main/docker-compose.yml
 ```
 
 No `wget`? Use `curl`:
 
 ```bash
 mkdir overlord && cd overlord
-curl -O https://raw.githubusercontent.com/doesntbreaktos/Overlord/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/Lonhaax/overlord/main/docker-compose.yml
 ```
 
 **3. Start it**
@@ -259,13 +259,13 @@ docker compose up -d
 
 The Compose file itself is downloaded from the canonical GitHub repository,
 and the default image is pulled from GitHub Container Registry at
-`ghcr.io/doesntbreaktos/overlord:latest`.
+`ghcr.io/lonhaax/overlord:latest`.
 
 Maintainers can publish a matching multi-architecture GHCR image from the
-[overlord-ci workflow](https://github.com/doesntbreaktos/Overlord/actions/workflows/docker-publish.yml).
+[overlord-ci workflow](https://github.com/Lonhaax/overlord/actions/workflows/docker-publish.yml).
 Select **Run workflow** and enter the version currently declared by the server
 and agent (for example, `3.1.0`). The workflow publishes version, major/minor,
-major, and `latest` tags to `ghcr.io/doesntbreaktos/overlord`. Keep the package
+major, and `latest` tags to `ghcr.io/lonhaax/overlord`. Keep the package
 visibility public so Compose can pull it without GitHub authentication.
 
 **4. Get the initial password**
@@ -337,8 +337,8 @@ docker compose version
 **2. Get the project**
 
 ```bash
-git clone https://github.com/doesntbreaktos/Overlord.git
-cd Overlord
+git clone https://github.com/Lonhaax/overlord.git
+cd overlord
 ```
 
 **3. Start it**
