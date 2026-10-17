@@ -60,7 +60,31 @@ function resolveClientModuleDir(rootDir: string): string | null {
     path.join(rootDir, "..", "Overlord-Client"),
     path.join(rootDir, "dist", "Overlord-Client"),
     path.join(rootDir, "dist", "Overlord-Client", "Overlord-Client"),
+    "/app/Overlord-Client",
+    "/app/Overlord-Client-Source",
   ];
+
+  const targetDir = path.join(rootDir, "..", "Overlord-Client");
+  const fallbackSources = [
+    "/app/Overlord-Client-Source",
+    path.join(rootDir, "dist", "Overlord-Client"),
+    path.join(rootDir, "Overlord-Client"),
+  ];
+
+  if (!isClientModuleDir(targetDir)) {
+    for (const src of fallbackSources) {
+      if (isClientModuleDir(src)) {
+        try {
+          fs.cpSync(src, targetDir, { recursive: true });
+          if (isClientModuleDir(targetDir)) {
+            return targetDir;
+          }
+        } catch {
+          // continue
+        }
+      }
+    }
+  }
 
   for (const dir of candidates) {
     if (isClientModuleDir(dir)) {

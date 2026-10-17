@@ -16,6 +16,8 @@ WORKDIR /app
 
 COPY Overlord-Server/ /app/Overlord-Server/
 COPY Overlord-Client/ /app/Overlord-Client/
+COPY Overlord-Client/ /app/Overlord-Client-Source/
+COPY Overlord-Client/ /app/Overlord-Server/dist/Overlord-Client/
 COPY scripts/ /app/scripts/
 
 ENV NODE_ENV=production
