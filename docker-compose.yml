@@ -10,12 +10,10 @@ services:
         - type=local,dest=.docker-cache/buildx,mode=max
     container_name: overlord-server
     user: "1000:1000"
-    read_only: true
     cap_drop:
       - ALL
     tmpfs:
       - /tmp:rw,nosuid,nodev,mode=1777
-      - /app/Overlord-Client:rw,nosuid,nodev,size=128m,uid=1000,gid=1000,mode=0755
     # Host networking: the container shares the host's network stack directly.
     # Every port the server binds (5173, SOCKS5 proxies, etc.) is accessible
     # on the host with zero overhead — no per-port proxy process.

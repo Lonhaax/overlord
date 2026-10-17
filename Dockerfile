@@ -36,7 +36,7 @@ RUN bun run build
 
 RUN bun run minify
 
-RUN mkdir -p /app/data
+RUN mkdir -p /app/data && chown -R 1000:1000 /app /home/bun
 
 USER root
 

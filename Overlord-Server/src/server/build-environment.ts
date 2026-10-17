@@ -43,5 +43,8 @@ export function createIsolatedGoBuildEnv(
     GOMODCACHE: path.join(cacheRoot, "go-mod"),
     GOTMPDIR: path.join(cacheRoot, "go-tmp"),
     GARBLE_CACHE: path.join(cacheRoot, "garble"),
+    GOPATH: path.join(cacheRoot, "go-path"),
+    GOTOOLCHAIN: "local",
+    HOME: cacheRoot,
   };
 }
