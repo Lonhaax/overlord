@@ -219,8 +219,15 @@ const PORT = config.server.port;
 const HOST = config.server.host;
 
 function resolveRuntimeRoot(): string {
+  if (existsSync("/app/dist-clients") && existsSync("/app/Overlord-Server")) {
+    return "/app";
+  }
   if (process.env.OVERLORD_ROOT?.trim()) {
-    return path.resolve(process.env.OVERLORD_ROOT);
+    const explicit = path.resolve(process.env.OVERLORD_ROOT);
+    if (path.basename(explicit) === "Overlord-Server" && existsSync(path.join(explicit, "..", "dist-clients"))) {
+      return path.resolve(explicit, "..");
+    }
+    return explicit;
   }
   const fromMeta = fileURLToPath(new URL("..", import.meta.url));
   if (existsSync(path.join(fromMeta, "public"))) return fromMeta;
