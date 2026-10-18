@@ -744,7 +744,7 @@ export async function startBuildProcess(
 
     const serverConfig = getConfig();
     const buildAgentToken = (serverConfig.auth.agentToken || "").trim();
-    const buildTlsSpkiPins: string[] = [];
+    const buildTlsSpkiPins: string[] = getActiveTlsSpkiPins();
 
     const rootDir = resolveRuntimeRoot();
     const outDir = path.join(rootDir, "dist-clients");

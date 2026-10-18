@@ -60,7 +60,19 @@ function publishActiveTlsPins(certificatePem: string): void {
 
 export function getActiveTlsSpkiPins(): string[] {
   if (activeTlsSpkiPins.length > 0) return [...activeTlsSpkiPins];
-  return normalizeSpkiPins(process.env.OVERLORD_TLS_SPKI_PINS);
+  const envPins = normalizeSpkiPins(process.env.OVERLORD_TLS_SPKI_PINS);
+  if (envPins.length > 0) return envPins;
+
+  const certPath = process.env.OVERLORD_TLS_CERT || "/app/certs/server.crt";
+  try {
+    if (fs.existsSync(certPath)) {
+      const pem = fs.readFileSync(certPath, "utf-8");
+      return [computeCertificateSpkiPin(pem)];
+    }
+  } catch {
+    // fallback
+  }
+  return [];
 }
 
 function selfSignedCertificateOptions(params: TlsBootstrapParams) {
