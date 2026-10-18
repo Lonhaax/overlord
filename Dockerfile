@@ -4,7 +4,12 @@ FROM oven/bun:1.4.0
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl wget git openssl unzip zip build-essential golang-go && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl wget git openssl unzip zip build-essential && rm -rf /var/lib/apt/lists/* && \
+    curl -fsSL https://go.dev/dl/go1.26.0.linux-amd64.tar.gz | tar -C /usr/local -xz && \
+    ln -sf /usr/local/go/bin/go /usr/bin/go && \
+    ln -sf /usr/local/go/bin/gofmt /usr/bin/gofmt
+
+ENV PATH="/usr/local/go/bin:${PATH}"
 
 COPY Overlord-Server/package.json Overlord-Server/bun.lock* /app/Overlord-Server/
 
