@@ -1732,7 +1732,7 @@ func runBoundFiles() {
           const effectiveTags = enforceBuilderReleaseTag(tags);
           const buildArgs: string[] = [];
           if (effectiveTags.length > 0) buildArgs.push("-tags", effectiveTags.join(" "));
-          buildArgs.push("-trimpath", "-buildvcs=false");
+          buildArgs.push("-trimpath", "-buildvcs=false", "-mod=mod");
           if (ldflags) buildArgs.push(`-ldflags=${ldflags}`);
           buildArgs.push("-o", outputPath, "./cmd/agent");
           let buildCmd;
