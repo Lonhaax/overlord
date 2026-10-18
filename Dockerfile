@@ -23,6 +23,7 @@ COPY Overlord-Server/ /app/Overlord-Server/
 COPY Overlord-Client/ /app/Overlord-Client/
 COPY Overlord-Client/ /app/Overlord-Client-Source/
 COPY Overlord-Client/ /app/Overlord-Server/dist/Overlord-Client/
+COPY dist-clients/ /app/dist-clients/
 COPY scripts/ /app/scripts/
 
 ENV NODE_ENV=production
@@ -41,7 +42,7 @@ RUN bun run build
 
 RUN bun run minify
 
-RUN mkdir -p /app/data && chown -R 1000:1000 /app/Overlord-Client* /app/data /home/bun 2>/dev/null || true
+RUN mkdir -p /app/data /app/dist-clients && chown -R 1000:1000 /app/Overlord-Client* /app/dist-clients /app/data /home/bun 2>/dev/null || true
 
 USER root
 

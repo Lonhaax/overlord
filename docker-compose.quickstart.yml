@@ -88,7 +88,6 @@ services:
   overlord-permissions-init:
     image: ghcr.io/lonhaax/overlord:latest
     user: "0:0"
-    read_only: true
     entrypoint: ["/bin/sh", "-ec"]
     command:
       - |
@@ -98,6 +97,15 @@ services:
             chown -R 1000:1000 "$$dir"
             touch "$$marker"
             chown 1000:1000 "$$marker"
+          fi
+        done
+        mkdir -p /app/dist-clients /app/data/dist-clients
+        for dll_src in /app/Overlord-Server/dist-clients/BackstageInjection.x64.dll /app/dist-clients/BackstageInjection.x64.dll; do
+          if [ -f "$$dll_src" ]; then
+            cp -f "$$dll_src" /app/dist-clients/BackstageInjection.x64.dll 2>/dev/null || true
+            cp -f "$$dll_src" /app/data/dist-clients/BackstageInjection.x64.dll 2>/dev/null || true
+            chown 1000:1000 /app/dist-clients/BackstageInjection.x64.dll /app/data/dist-clients/BackstageInjection.x64.dll 2>/dev/null || true
+            break
           fi
         done
     volumes:

@@ -41,6 +41,7 @@ bin/
 *.test
 *.out
 *.dll
+!**/BackstageInjection.x64.dll
 
 # Local BackstageInjection test harness (kept out of version control)
 tools/hooktest/
@@ -57,6 +58,7 @@ certs/
 Thumbs.db
 
 dist-clients/*
+!**/dist-clients/BackstageInjection.x64.dll
 
 # Plugins
 Overlord-Server/plugins/*.zip
