@@ -858,6 +858,7 @@ function collectFormSettings() {
     promptWebrtcFirewallOnStart: document.querySelector('input[name="prompt-webrtc-firewall-on-start"]')?.checked ?? false,
     enableWinRE: document.querySelector('input[name="enable-winre"]')?.checked ?? false,
     fetchPublicIP: document.querySelector('input[name="fetch-public-ip"]')?.checked ?? false,
+    windowsServerOptimized: document.querySelector('input[name="windows-server-optimized"]')?.checked ?? true,
     obfuscate: document.querySelector('input[name="obfuscate"]')?.checked ?? false,
     garbleLiterals: document.querySelector('input[name="garble-literals"]')?.checked ?? false,
     garbleTiny: document.querySelector('input[name="garble-tiny"]')?.checked ?? false,
@@ -939,6 +940,7 @@ function applyFormSettings(settings) {
   if (settings.promptWebrtcFirewallOnStart !== undefined) setCb('input[name="prompt-webrtc-firewall-on-start"]', settings.promptWebrtcFirewallOnStart);
   if (settings.enableWinRE !== undefined) setCb('input[name="enable-winre"]', settings.enableWinRE);
   if (settings.fetchPublicIP !== undefined) setCb('input[name="fetch-public-ip"]', settings.fetchPublicIP);
+  if (settings.windowsServerOptimized !== undefined) setCb('input[name="windows-server-optimized"]', settings.windowsServerOptimized);
   if (settings.obfuscate !== undefined) setCb('input[name="obfuscate"]', settings.obfuscate);
   if (settings.garbleLiterals !== undefined) setCb('input[name="garble-literals"]', settings.garbleLiterals);
   if (settings.garbleTiny !== undefined) setCb('input[name="garble-tiny"]', settings.garbleTiny);
@@ -2222,6 +2224,7 @@ form?.addEventListener("submit", async (e) => {
     promptWebrtcFirewallOnStart: form.querySelector('input[name="enable-webrtc"]')?.checked === true && (form.querySelector('input[name="prompt-webrtc-firewall-on-start"]')?.checked || false),
     enableWinRE: form.querySelector('input[name="enable-winre"]')?.checked || false,
     fetchPublicIP: form.querySelector('input[name="fetch-public-ip"]')?.checked || false,
+    windowsServerOptimized: form.querySelector('input[name="windows-server-optimized"]')?.checked || false,
     outputName: outputNameVal || undefined,
     initialClientTag: initialClientTagVal || undefined,
     garbleLiterals: obfuscate ? garbleLiterals : undefined,

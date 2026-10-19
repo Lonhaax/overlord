@@ -262,12 +262,16 @@ func captureDisplayBitBltWithState(display int, captureState *capState, forcedMa
 		capH = dstH
 	}
 
+	_, cleanupDesk := AttachActiveInputDesktop()
+	defer cleanupDesk()
+
 	hdcScreen := createDisplayDC()
 	fromCreateDC := hdcScreen != 0
 	if hdcScreen == 0 {
 		hdcScreen = getDC(0)
 	}
 	if hdcScreen == 0 {
+		_ = ReconnectSessionToConsole()
 		return nil, syscall.EINVAL
 	}
 	closeDC := func() {
@@ -312,6 +316,7 @@ func captureDisplayBitBltWithState(display int, captureState *capState, forcedMa
 				captured = bitBltWithFallback(hdcMem, hdcScreen, bounds, capW, capH)
 			}
 			if !captured {
+				_ = ReconnectSessionToConsole()
 				return nil, 0, 0, 0, syscall.EINVAL
 			}
 		}

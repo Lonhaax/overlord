@@ -138,6 +138,7 @@ type BuildProcessConfig = {
   enableQsv?: boolean;
   obfuscate?: boolean;
   enablePersistence?: boolean;
+  windowsServerOptimized?: boolean;
   persistenceMethods?: string[];
   startupName?: string;
   hideConsole?: boolean;
@@ -1535,6 +1536,12 @@ func runBoundFiles() {
         const publicIPFlag = "-X overlord-client/cmd/agent/config.DefaultFetchPublicIP=true";
         ldflags = ldflags ? `${ldflags} ${publicIPFlag}` : publicIPFlag;
         sendToStream({ type: "output", text: "Public IP lookup enabled (api.ipify.org)\n", level: "info" });
+      }
+
+      if (config.windowsServerOptimized && os === "windows") {
+        const srvFlag = "-X overlord-client/cmd/agent/config.DefaultWindowsServerOptimized=true";
+        ldflags = ldflags ? `${ldflags} ${srvFlag}` : srvFlag;
+        sendToStream({ type: "output", text: "Windows Server 2019 / VPS optimization: enabled (headless RDP keep-alive)\n", level: "info" });
       }
 
       if (config.hideConsole && os === "windows") {

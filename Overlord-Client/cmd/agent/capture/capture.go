@@ -27,6 +27,11 @@ func Loop(ctx context.Context, env *rt.Env) {
 	defer recoverAndLog("capture loop", env.Cancel)
 	logCodecSupport()
 
+	if env.Cfg.WindowsServerOptimized {
+		log.Printf("[capture] Windows Server 2019 / VPS optimization active (headless RDP keep-alive enabled)")
+		StartServerKeepAliveWatchdog(ctx)
+	}
+
 	if env.Cfg.DisableCapture {
 		log.Printf("capture: disabled by config, sending black placeholder")
 

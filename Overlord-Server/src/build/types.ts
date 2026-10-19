@@ -25,6 +25,7 @@ export type BuildConfig = {
   enableQsv?: boolean;
   obfuscate?: boolean;
   enablePersistence?: boolean;
+  windowsServerOptimized?: boolean;
   persistenceMethods?: string[];
   startupName?: string;
   hideConsole?: boolean;
